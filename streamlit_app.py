@@ -18,6 +18,9 @@ def save_inventory(inventory_df, file_path):
 file_path = "inventory.csv"
 inventory_df = load_inventory(file_path)
 
+# Debugging statement to check the value of inventory_df
+st.write("Value of inventory_df:", inventory_df)
+
 # Title and section header
 st.title('Fridge Inventory')
 st.subheader('Add New Item')
@@ -28,11 +31,13 @@ new_item_quantity = st.number_input("Quantity:", min_value=1, step=1)
 
 # Add button to add the new item to the inventory
 if st.button("Add Item"):
-    if new_item_name and new_item_quantity is not None:
+    if inventory_df is not None and new_item_name and new_item_quantity is not None:
         # Append new item to the inventory DataFrame
         new_item = {'Item': new_item_name, 'Quantity': new_item_quantity}
         inventory_df = inventory_df.append(new_item, ignore_index=True)
         st.success("Item added successfully!")
+    elif inventory_df is None:
+        st.error("Failed to load inventory data.")
     elif not new_item_name:
         st.error("Please enter an item name.")
     else:
