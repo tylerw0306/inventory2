@@ -28,13 +28,15 @@ new_item_quantity = st.number_input("Quantity:", min_value=1, step=1)
 
 # Add button to add the new item to the inventory
 if st.button("Add Item"):
-    if new_item_name:
+    if new_item_name and new_item_quantity is not None:
         # Append new item to the inventory DataFrame
         new_item = {'Item': new_item_name, 'Quantity': new_item_quantity}
         inventory_df = inventory_df.append(new_item, ignore_index=True)
         st.success("Item added successfully!")
-    else:
+    elif not new_item_name:
         st.error("Please enter an item name.")
+    else:
+        st.error("Please enter a quantity.")
 
 # Display the current inventory
 st.subheader('Current Inventory')
