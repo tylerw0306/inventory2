@@ -1,47 +1,35 @@
 import streamlit as st
 import pandas as pd
 
-# Function to load or create the inventory DataFrame
-def load_inventory(file_path):
-    try:
-        inventory_df = pd.read_csv(file_path)
-    except FileNotFoundError:
-        # If the file does not exist, create an empty DataFrame
-        inventory_df = pd.DataFrame(columns=['Item', 'Quantity'])
-    return inventory_df
+import pathlib
+import textwrap
 
-# Save the inventory DataFrame to a CSV file
-def save_inventory(inventory_df, file_path):
-    inventory_df.to_csv(file_path, index=False)
+import google.generativeai as genai
 
-# Load or create the inventory DataFrame
-file_path = "inventory.csv"
-inventory_df = load_inventory(file_path)
+from IPython.display import display
+from IPython.display import Markdown
 
-# Title and section header
-st.title('Fridge Inventory')
-st.subheader('Add New Item')
 
-# Input fields for adding a new item
-new_item_name = st.text_input("Item Name:")
-new_item_quantity = st.number_input("Quantity:", min_value=1, step=1)
+def to_markdown(text):
+  text = text.replace('•', '  *')
+  return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 
-# Add button to add the new item to the inventory
-if st.button("Add Item"):
-    if new_item_name.strip():  # Check if item name is not empty
-        if new_item_quantity is not None and new_item_quantity > 0:  # Check if quantity is valid
-            # Append new item to the inventory DataFrame
-            new_item = {'Item': new_item_name, 'Quantity': new_item_quantity}
-            inventory_df = inventory_df.append(new_item, ignore_index=True)
-            st.success("Item added successfully!")
-        else:
-            st.error("Please enter a valid quantity.")
-    else:
-        st.error("Please enter an item name.")
+genai.configure(api_key="AIzaSyDGjSjvHDdDXARxMR3yOybRFll2SeQc4AI")
+
+model = genai.GenerativeModel('gemini-pro')
+
+
+
+prompt = "Given this list of ingredients,and allergens to avoid, can you generate 15 recipes for me? Can you give me steps to each recipie as well in one large block. Note: if there is an allergen involved, make sure none of the recipies you suggest involve it. Also, next to each recipe make a note of what allergens it avoids."
+ingredients = "Ingredients: eggs, milk, cheese, butter, yogurt, lettuce, tomatoes, cucumber, carrots, onions, bell peppers, chicken, beef, pork, fish, shrimp, mayonnaise, ketchup, mustard, pickles, bread, pasta, rice, potatoes, garlic, ginger, lemon"
+allergens = "Allergens: Peanuts, Vegan"
+
+
+response = model.generate_content(
+    prompt + allergens + ingredients
+)
+print(response.text)
 
 # Display the current inventory
-st.subheader('Current Inventory')
-st.write(inventory_df)
-
-# Save inventory changes when the user exits the app
-save_inventory(inventory_df, file_path)
+st.title('Receipes')
+st.write(response.text)
