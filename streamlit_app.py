@@ -32,4 +32,4 @@ print(response.text)
 
 # Display the current inventory
 st.title('Receipes')
-st.write(response)
+#st.write(response.text)
